@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  llm-council-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: llm-council-backend
+    environment:
+      - POLZAAI_API_KEY=${POLZAAI_API_KEY}
+    networks:
+      - llm-council-network
+    restart: always
+
+  llm-council-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: llm-council-frontend
+    networks:
+      - llm-council-network
+    restart: always
+
+llm-council-nginx:
+    image: nginx:alpine
+    container_name: llm-council-nginx
+    # Убираем публикацию портов, чтобы не конфликтовать с n8n
+    # Доступ к сервису будет осуществляться через доменное имя
+    # Доступ к сервису осуществляется через внешний reverse proxy (например, Traefik)
+    # Порты не публикуются наружу, чтобы избежать конфликта с n8n
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - llm-council-backend
+      - llm-council-frontend
+    networks:
+      - llm-council-network
+    labels:
+      # Настройки для внешнего Traefik
+      - "traefik.enable=true"
+      - "traefik.http.routers.llm-council.entrypoints=web,websecure"
+      - "traefik.http.routers.llm-council.rule=Host(`llm.clusterdev.ru`)"
+      - "traefik.http.routers.llm-council.tls=true"
+      - "traefik.http.routers.llm-council.tls.certresolver=myresolver"
+      - "traefik.http.services.llm-council.loadbalancer.server.port=8080"
+    restart: always
+
+networks:
+  llm-council-network:
+    driver: bridge

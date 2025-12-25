@@ -2,14 +2,15 @@
  * API client for the LLM Council backend.
  */
 
-const API_BASE = 'http://localhost:8001';
+// Используем относительный путь для API запросов, чтобы они проходили через nginx прокси
+const API_BASE = '/api';
 
 export const api = {
   /**
    * List all conversations.
    */
   async listConversations() {
-    const response = await fetch(`${API_BASE}/api/conversations`);
+    const response = await fetch(`${API_BASE}/conversations`);
     if (!response.ok) {
       throw new Error('Failed to list conversations');
     }
@@ -20,7 +21,7 @@ export const api = {
    * Create a new conversation.
    */
   async createConversation() {
-    const response = await fetch(`${API_BASE}/api/conversations`, {
+    const response = await fetch(`${API_BASE}/conversations`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -38,7 +39,7 @@ export const api = {
    */
   async getConversation(conversationId) {
     const response = await fetch(
-      `${API_BASE}/api/conversations/${conversationId}`
+      `${API_BASE}/conversations/${conversationId}`
     );
     if (!response.ok) {
       throw new Error('Failed to get conversation');
@@ -51,7 +52,7 @@ export const api = {
    */
   async sendMessage(conversationId, content) {
     const response = await fetch(
-      `${API_BASE}/api/conversations/${conversationId}/message`,
+      `${API_BASE}/conversations/${conversationId}/message`,
       {
         method: 'POST',
         headers: {
@@ -75,7 +76,7 @@ export const api = {
    */
   async sendMessageStream(conversationId, content, onEvent) {
     const response = await fetch(
-      `${API_BASE}/api/conversations/${conversationId}/message/stream`,
+      `${API_BASE}/conversations/${conversationId}/message/stream`,
       {
         method: 'POST',
         headers: {

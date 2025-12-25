@@ -79,6 +79,38 @@ npm run dev
 
 Then open http://localhost:5173 in your browser.
 
+## Production Deployment
+
+The application can be deployed using Docker Compose with nginx as a reverse proxy.
+
+### Prerequisites
+- Docker and Docker Compose
+- A server with domain name (llm.clusterdev.ru) pointing to the server IP
+- An external reverse proxy (like Traefik) configured to handle SSL and forward requests to the application
+
+### Deployment Steps
+1. Clone the repository
+2. Create a `.env` file with your PolzaAI API key:
+   ```
+   POLZAAI_API_KEY=your-polzaai-api-key-here
+   ```
+3. Ensure your domain (llm.clusterdev.ru) points to your server IP
+4. If using external SSL proxy (Traefik), make sure it's configured to forward requests to this container
+5. Run the following command:
+   ```bash
+   docker-compose up -d
+ ```
+6. Configure your external Traefik reverse proxy to route requests for llm.clusterdev.ru to this container
+7. The application will be available at https://llm.clusterdev.ru
+### SSL Configuration
+The nginx configuration is designed to work with an external SSL termination proxy (like Traefik) that handles SSL certificates. The application listens on port 80 internally and should be accessed via domain name through the external proxy.
+
+## Tech Stack
+- **Backend:** FastAPI (Python 3.10+), async httpx, PolzaAI API
+- **Frontend:** React + Vite, react-markdown for rendering
+- **Storage:** JSON files in `data/conversations/`
+- **Package Management:** uv for Python, npm for JavaScript
+
 ## Tech Stack
 
 - **Backend:** FastAPI (Python 3.10+), async httpx, PolzaAI API
